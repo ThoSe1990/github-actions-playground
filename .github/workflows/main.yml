@@ -1,0 +1,27 @@
+name: Self-Hosted Runner Example
+
+on: 
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual execution from GitHub UI
+
+jobs:
+  simple-job:
+    runs-on: self-hosted # Runs on your local machine (self-hosted runner)
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Print system info
+        run: |
+          echo "Running on $(uname -s) $(uname -r)"
+          echo "User: $(whoami)"
+          echo "Current directory: $(pwd)"
+
+      - name: Run a simple script
+        run: echo "Hello from my self-hosted runner!"
+
+      - name: List files in repo
+        run: ls -lah
