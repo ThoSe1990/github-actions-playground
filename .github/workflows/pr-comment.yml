@@ -20,7 +20,7 @@ jobs:
       - name: Check for open PR
         id: find-pr
         run: |
-          PR_NUMBER=$(gh pr list --base $BRANCH_NAME --state open --json number --jq '.[0].number')
+          PR_NUMBER=$(gh pr list --head $BRANCH_NAME --state open --json number --jq '.[0].number')
           if [[ -n "$PR_NUMBER" ]]; then
             echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
             echo "Found open PR #$PR_NUMBER"
