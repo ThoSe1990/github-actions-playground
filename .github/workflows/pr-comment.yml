@@ -1,0 +1,38 @@
+name: PR Commenter
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  check-pr-and-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # Needed to post a comment
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get current branch name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Check for open PR
+        id: find-pr
+        run: |
+          PR_NUMBER=$(gh pr list --base $BRANCH_NAME --state open --json number --jq '.[0].number')
+          if [[ -n "$PR_NUMBER" ]]; then
+            echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+            echo "Found open PR #$PR_NUMBER"
+          else
+            echo "No open PR found"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post comment to PR
+        if: env.PR_NUMBER != ''
+        run: |
+          gh pr comment $PR_NUMBER --body "A manual job was triggered on branch '${{ env.BRANCH_NAME }}'. 🚀"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
